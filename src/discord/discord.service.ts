@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   Client,
+  Events,
   GatewayIntentBits,
   EmbedBuilder,
   TextChannel,
@@ -24,7 +25,7 @@ export class DiscordService implements OnModuleInit {
   async onModuleInit() {
     const token = this.configService.getOrThrow<string>('DISCORD_TOKEN');
 
-    this.client.on('ready', () => {
+    this.client.on(Events.ClientReady, () => {
       this.logger.log('RED QUEEN ONLINE - All primary systems operational');
     });
 
