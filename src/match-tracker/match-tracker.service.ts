@@ -18,7 +18,7 @@ export class MatchTrackerService {
     private readonly discordService: DiscordService,
   ) {}
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_MINUTE)
   async pollForNewMatches(): Promise<void> {
     if (this.isProcessing) {
       this.logger.debug('Previous scan still in progress, skipping...');
