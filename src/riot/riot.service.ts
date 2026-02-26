@@ -7,7 +7,8 @@ import { RiotMatchDto, SubjectStats } from './interfaces/match.interface';
 @Injectable()
 export class RiotService {
   private readonly logger = new Logger(RiotService.name);
-  private readonly baseUrl: string;
+  private readonly regionUrl: string; // for Match-V5 (americas, europe, asia)
+  private readonly platformUrl: string; // for Summoner-V4, etc. (br1, na1, euw1)
   private readonly apiKey: string;
   private readonly puuid: string;
 
@@ -16,14 +17,16 @@ export class RiotService {
     private readonly httpService: HttpService,
   ) {
     const region = this.configService.getOrThrow<string>('RIOT_REGION');
-    this.baseUrl = `https://${region}.api.riotgames.com`;
+    const platform = this.configService.getOrThrow<string>('RIOT_PLATFORM');
+    this.regionUrl = `https://${region}.api.riotgames.com`;
+    this.platformUrl = `https://${platform}.api.riotgames.com`;
     this.apiKey = this.configService.getOrThrow<string>('RIOT_API_KEY');
     this.puuid = this.configService.getOrThrow<string>('MY_PUUID');
   }
 
   async getLatestMatchId(): Promise<string | null> {
     try {
-      const url = `${this.baseUrl}/lol/match/v5/matches/by-puuid/${this.puuid}/ids?count=1`;
+      const url = `${this.regionUrl}/lol/match/v5/matches/by-puuid/${this.puuid}/ids?count=1`;
       const response = await firstValueFrom(
         this.httpService.get<string[]>(url, {
           headers: { 'X-Riot-Token': this.apiKey },
@@ -42,7 +45,7 @@ export class RiotService {
 
   async getMatchDetails(matchId: string): Promise<RiotMatchDto | null> {
     try {
-      const url = `${this.baseUrl}/lol/match/v5/matches/${matchId}`;
+      const url = `${this.regionUrl}/lol/match/v5/matches/${matchId}`;
       const response = await firstValueFrom(
         this.httpService.get<RiotMatchDto>(url, {
           headers: { 'X-Riot-Token': this.apiKey },
